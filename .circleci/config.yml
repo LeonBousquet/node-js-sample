@@ -8,7 +8,7 @@ jobs:
      # with credentials stored in the UI
 
      # build the application image
-     - run: docker build -t node-js-sample:master .
+     - run: docker build -t nodedocker .
 
      # deploy the image
      - run: docker push node-js-sample:master
