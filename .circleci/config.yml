@@ -1,16 +1,17 @@
-version: 2.1
-
+version: 2
 jobs:
- build1: # job name
-   docker: # Specifies the primary container image,
-     - image: buildpack-deps:trusty
-       auth:
-         username: neleleonemack
-         password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
-#...
- build2:
-   machine: # Specifies a machine image that uses
-   # an Ubuntu version 20.04 image with Docker 19.03.13
-   # and docker-compose 1.27.4, follow CircleCI Discuss Announcements
-   # for new image releases.
-     image: ubuntu-2004:202010-01
+ build:
+   machine: true
+   steps:
+     - checkout
+     # start proprietary DB using private Docker image
+     # with credentials stored in the UI
+     - run: |
+         echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+         docker run -d --name db company/proprietary-db:1.2.3
+
+     # build the application image
+     - run: docker build -t company/app:$CIRCLE_BRANCH .
+
+     # deploy the image
+     - run: docker push company/app:$CIRCLE_BRANCH
