@@ -1,8 +1,4 @@
-version 2.1
 jobs:
-  build:
-    machine:
-      image: ubuntu-2004:202010-01
   build:
     docker:
       - image: buildpack-deps:trusty # primary container
