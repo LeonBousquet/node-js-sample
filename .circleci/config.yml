@@ -1,3 +1,4 @@
+version 2.1
 jobs:
   build:
     docker:
@@ -7,3 +8,26 @@ jobs:
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
         environment:
           ENV: CI
+
+      - image: mongo:2.6.8
+        auth:
+          username: neleleonemack
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+        command: [--smallfiles]
+
+      - image: postgres:9.4.1
+        auth:
+          username: neleleonemack
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+        environment:
+          POSTGRES_USER: root
+
+      - image: redis@sha256:54057dd7e125ca41afe526a877e8bd35ec2cdd33b9217e022ed37bdcf7d09673
+        auth:
+          username: neleleonemack
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+
+      - image: acme-private/private-image:321
+        auth:
+          username: neleleonemack
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
