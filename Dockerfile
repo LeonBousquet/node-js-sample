@@ -1,12 +1,7 @@
-FROM node:14
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
+FROM node:current-alpine3.14
+WORKDIR /app
+COPY package*.json /app/
 RUN npm ci
-
-COPY . .
-
+COPY . /app/
 EXPOSE 8080
-
-CMD [ "node", "app.js" ]
+ENTRYPOINT npm start
