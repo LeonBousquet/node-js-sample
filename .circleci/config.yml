@@ -1,0 +1,50 @@
+version: 2.1
+
+jobs:
+  install:
+    docker:
+      - image: node:lts
+    steps:
+      - checkout
+      - run: npm ci
+      - save_cache:
+          paths:
+            - ~/usr/local/lib/node_modules  # location depends on npm version
+          key: node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
+  curl_testing:
+    machine:
+      image: ubuntu-2004:202107-02
+    steps:
+      - checkout  
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
+            - node-v1-{{ .Branch }}-
+            - node-v1-
+      - run: |
+          docker build -t nodejs_sample_app:SNAPSHOT .
+          docker run -d -p 8080:8080 nodejs_sample_app:SNAPSHOT
+      - run: |
+          curl -v http://localhost:8080/users
+    
+  publish:
+    machine:
+      image: ubuntu-2004:202107-02
+    steps:
+      - checkout
+      - run: |
+          docker login --username $DOCKER_LOGIN --password $DOCKER_PASSWORD
+          docker build -t LeonBousquet/nodejs-sample .
+          docker push LeonBousquet/nodejs-sample
+workflows:
+  version: 2
+  custom_workflow:
+    jobs:
+      - install
+      - curl_testing: 
+          requires:
+            - install
+      - publish:
+          requires:
+            - curl_testing
